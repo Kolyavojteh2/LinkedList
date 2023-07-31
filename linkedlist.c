@@ -2,29 +2,43 @@
 #include <malloc.h>
 #include <string.h>
 
+static void LinkedList_connectTwoNodes(LinkedList_t *const first, LinkedList_t *const second)
+{
+    if (first)
+        first->next = second;
+    if (second)
+        second->prev = first;
+}
+
 LinkedList_t* LinkedList_make(void)
 {
 	LinkedList_t* ptr = (LinkedList_t*)calloc(1, sizeof(LinkedList_t));
 	return ptr;
 }
 
-LinkedList_t* LinkedList_last(const LinkedList_t *list)
+LinkedList_t* LinkedList_last(LinkedList_t *list)
 {
+    if (list == NULL)
+        return NULL;
+
     while (list->next)
         list = list->next;
 
     return list;
 }
 
-LinkedList_t* LinkedList_first(const LinkedList_t *list)
+LinkedList_t* LinkedList_first(LinkedList_t *list)
 {
+    if (list == NULL)
+        return NULL;
+
     while (list->prev)
         list = list->prev;
 
     return list;
 }
 
-int LinkedList_isCyclic(const LinkedList_t * const list)
+int LinkedList_isCyclic(LinkedList_t * const list)
 {
     LinkedList_t* current_node = list;
     while (current_node->next)
@@ -38,12 +52,12 @@ int LinkedList_isCyclic(const LinkedList_t * const list)
     return 0;
 }
 
-LinkedList_t* LinkedList_findRelative(const LinkedList_t* list, const int index)
+LinkedList_t* LinkedList_findRelative(LinkedList_t* list, const int index)
 {
     if (index < 0)
         return NULL;
 
-    for (unsigned int i = 0; i < index; ++i)
+    for (int i = 0; i < index; ++i)
     {
         if (list->next == NULL)
             return NULL;
@@ -54,7 +68,7 @@ LinkedList_t* LinkedList_findRelative(const LinkedList_t* list, const int index)
     return list;
 }
 
-LinkedList_t* LinkedList_findAbsolute(const LinkedList_t* list, const int index)
+LinkedList_t* LinkedList_findAbsolute(LinkedList_t* list, const int index)
 {
     if (index < 0)
         return NULL;
@@ -75,19 +89,26 @@ LinkedList_t* LinkedList_insertRelative(LinkedList_t* list, const int index)
     if (new_node == NULL)
         return NULL;
 
-    LinkedList_t* target_node = LinkedList_findRelative(list, index);
-    if (target_node == NULL)
+    LinkedList_t* next_node = LinkedList_findRelative(list, index);
+    if (next_node == NULL)
+    {
+        free(new_node);
         return NULL;
+    }
 
-    LinkedList_t* prev_node = target_node->prev;
+    LinkedList_t* prev_node = next_node->prev;
+    /*
     if (prev_node)
     {
         new_node->prev = prev_node;
         prev_node->next = new_node;
     }
+    */
+    LinkedList_connectTwoNodes(prev_node, new_node);
+    LinkedList_connectTwoNodes(new_node, next_node);
 
-    new_node->next = target_node;
-    target_node->prev = new_node;
+    //new_node->next = next_node;
+    //next_node->prev = new_node;
 
     return new_node;
 }
@@ -104,7 +125,7 @@ LinkedList_t* LinkedList_insertAbsolute(LinkedList_t* list, const int index)
     return LinkedList_insertRelative(list, index);
 }
 
-int LinkedList_size(const LinkedList_t* list)
+int LinkedList_size(LinkedList_t* list)
 {
     if (LinkedList_isCyclic(list))
         return -1;
@@ -127,11 +148,15 @@ LinkedList_t* LinkedList_pushBack(LinkedList_t* list)
         return NULL;
 
     list = LinkedList_last(list);
-    if (list == NULL)
-        return NULL;
-
-    list->next = new_node;
-    new_node->prev = list;
+    /*
+    if (list)
+    {
+        list->next = new_node;
+        new_node->prev = list;
+    }
+    */
+    if (list)
+        LinkedList_connectTwoNodes(list, new_node);
 
     return new_node;
 }
@@ -143,11 +168,19 @@ LinkedList_t* LinkedList_pushFront(LinkedList_t* list)
         return NULL;
 
     list = LinkedList_first(list);
-    if (list == NULL)
+    if (list)
+        LinkedList_connectTwoNodes(new_node, list);
+    else
+    {
+        free(new_node);
         return NULL;
-
-    new_node->next = list;
-    list->prev = new_node;
+    }
+    /*
+    {
+        new_node->next = list;
+        list->prev = new_node;
+    }
+    */
 
     return new_node;
 }
@@ -161,11 +194,14 @@ int LinkedList_eraseRelative(LinkedList_t* list, const int index)
     LinkedList_t* prev_node = list->prev;
     LinkedList_t* next_node = list->next;
 
+    LinkedList_connectTwoNodes(prev_node, next_node);
+    /*
     if (prev_node)
         prev_node->next = next_node;
 
     if (next_node)
         next_node->prev = prev_node;
+    */
 
     free(list);
     return 0;

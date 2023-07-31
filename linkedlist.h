@@ -16,34 +16,34 @@ LinkedList_t* LinkedList_make(void);
 /// @brief finds the first element in the list
 /// @param list a node of the list
 /// @return a pointer to the found node
-LinkedList_t* LinkedList_first(const LinkedList_t *list);
+LinkedList_t* LinkedList_first(LinkedList_t *list);
 
 /// @brief finds the last element in the list
 /// @param list a node of the list
 /// @return a pointer to the found node
-LinkedList_t* LinkedList_last(const LinkedList_t *list);
+LinkedList_t* LinkedList_last(LinkedList_t *list);
 
 /// @brief checks if the list is cyclic
 /// @param list a node of the list
 /// @return 0, if isn't cyclic. 1, if is cyclic
-int LinkedList_isCyclic(const LinkedList_t * const list);
+int LinkedList_isCyclic(LinkedList_t * const list);
 
 /// @brief counts the size of list
 /// @param list a node of the list
 /// @return the size of the list or -1 if the list is cyclic
-int LinkedList_size(const LinkedList_t* list);
+int LinkedList_size(LinkedList_t* list);
 
 /// @brief searches for a node relative to the "list" parameter, which is "index" in order
 /// @param list a node of the list
 /// @param index an order number
 /// @return a pointer to the found node
-LinkedList_t* LinkedList_findRelative(const LinkedList_t* list, const int index);
+LinkedList_t* LinkedList_findRelative(LinkedList_t* list, const int index);
 
 /// @brief searches for the node relative to the beginning of the list that is in the order "pos"
 /// @param list a node of the list
 /// @param index an order number
 /// @return a pointer to the found node
-LinkedList_t* LinkedList_findAbsolute(const LinkedList_t* list, const int index);
+LinkedList_t* LinkedList_findAbsolute(LinkedList_t* list, const int index);
 
 /// @brief searches for a node relative to the "list" parameter that is in the order "index"
 /// @param list a node of the list
