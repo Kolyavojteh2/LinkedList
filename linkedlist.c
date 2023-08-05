@@ -10,13 +10,13 @@ static void LinkedList_connectTwoNodes(LinkedList_t *const first, LinkedList_t *
         second->prev = first;
 }
 
-LinkedList_t* LinkedList_make(void)
+LinkedList_t *LinkedList_make(void)
 {
-	LinkedList_t* ptr = (LinkedList_t*)calloc(1, sizeof(LinkedList_t));
-	return ptr;
+    LinkedList_t *ptr = (LinkedList_t *)calloc(1, sizeof(LinkedList_t));
+    return ptr;
 }
 
-LinkedList_t* LinkedList_last(LinkedList_t *list)
+LinkedList_t *LinkedList_last(LinkedList_t *list)
 {
     if (list == NULL)
         return NULL;
@@ -27,7 +27,7 @@ LinkedList_t* LinkedList_last(LinkedList_t *list)
     return list;
 }
 
-LinkedList_t* LinkedList_first(LinkedList_t *list)
+LinkedList_t *LinkedList_first(LinkedList_t *list)
 {
     if (list == NULL)
         return NULL;
@@ -38,9 +38,12 @@ LinkedList_t* LinkedList_first(LinkedList_t *list)
     return list;
 }
 
-int LinkedList_isCyclic(LinkedList_t * const list)
+int LinkedList_isCyclic(LinkedList_t *const list)
 {
-    LinkedList_t* current_node = list;
+    LinkedList_t *current_node = list;
+    if (current_node == NULL)
+        return 0;
+
     while (current_node->next)
     {
         current_node = current_node->next;
@@ -52,9 +55,12 @@ int LinkedList_isCyclic(LinkedList_t * const list)
     return 0;
 }
 
-LinkedList_t* LinkedList_findRelative(LinkedList_t* list, const int index)
+LinkedList_t *LinkedList_findRelative(LinkedList_t *list, const int index)
 {
     if (index < 0)
+        return NULL;
+
+    if (list == NULL)
         return NULL;
 
     for (int i = 0; i < index; ++i)
@@ -68,52 +74,43 @@ LinkedList_t* LinkedList_findRelative(LinkedList_t* list, const int index)
     return list;
 }
 
-LinkedList_t* LinkedList_findAbsolute(LinkedList_t* list, const int index)
+LinkedList_t *LinkedList_findAbsolute(LinkedList_t *list, const int index)
 {
     if (index < 0)
         return NULL;
 
     if (LinkedList_isCyclic(list))
         return NULL;
-    
+
     list = LinkedList_first(list);
     return LinkedList_findRelative(list, index);
 }
 
-LinkedList_t* LinkedList_insertRelative(LinkedList_t* list, const int index)
+LinkedList_t *LinkedList_insertRelative(LinkedList_t *list, const int index)
 {
     if (index < 0)
         return NULL;
 
-    LinkedList_t* new_node = LinkedList_make();
+    LinkedList_t *new_node = LinkedList_make();
     if (new_node == NULL)
         return NULL;
 
-    LinkedList_t* next_node = LinkedList_findRelative(list, index);
+    LinkedList_t *next_node = LinkedList_findRelative(list, index);
     if (next_node == NULL)
     {
         free(new_node);
         return NULL;
     }
 
-    LinkedList_t* prev_node = next_node->prev;
-    /*
-    if (prev_node)
-    {
-        new_node->prev = prev_node;
-        prev_node->next = new_node;
-    }
-    */
+    LinkedList_t *prev_node = next_node->prev;
+
     LinkedList_connectTwoNodes(prev_node, new_node);
     LinkedList_connectTwoNodes(new_node, next_node);
-
-    //new_node->next = next_node;
-    //next_node->prev = new_node;
 
     return new_node;
 }
 
-LinkedList_t* LinkedList_insertAbsolute(LinkedList_t* list, const int index)
+LinkedList_t *LinkedList_insertAbsolute(LinkedList_t *list, const int index)
 {
     if (index < 0)
         return NULL;
@@ -125,11 +122,11 @@ LinkedList_t* LinkedList_insertAbsolute(LinkedList_t* list, const int index)
     return LinkedList_insertRelative(list, index);
 }
 
-int LinkedList_size(LinkedList_t* list)
+int LinkedList_size(LinkedList_t *list)
 {
     if (LinkedList_isCyclic(list))
         return -1;
-    
+
     list = LinkedList_first(list);
     int count = 0;
     while (list)
@@ -141,84 +138,60 @@ int LinkedList_size(LinkedList_t* list)
     return count;
 }
 
-LinkedList_t* LinkedList_pushBack(LinkedList_t* list)
+LinkedList_t *LinkedList_pushBack(LinkedList_t *list)
 {
-    LinkedList_t* new_node = LinkedList_make();
+    LinkedList_t *new_node = LinkedList_make();
     if (new_node == NULL)
         return NULL;
 
     list = LinkedList_last(list);
-    /*
-    if (list)
-    {
-        list->next = new_node;
-        new_node->prev = list;
-    }
-    */
     if (list)
         LinkedList_connectTwoNodes(list, new_node);
 
     return new_node;
 }
 
-LinkedList_t* LinkedList_pushFront(LinkedList_t* list)
+LinkedList_t *LinkedList_pushFront(LinkedList_t *list)
 {
-    LinkedList_t* new_node = LinkedList_make();
+    LinkedList_t *new_node = LinkedList_make();
     if (new_node == NULL)
         return NULL;
 
     list = LinkedList_first(list);
     if (list)
         LinkedList_connectTwoNodes(new_node, list);
-    else
-    {
-        free(new_node);
-        return NULL;
-    }
-    /*
-    {
-        new_node->next = list;
-        list->prev = new_node;
-    }
-    */
 
     return new_node;
 }
 
-int LinkedList_eraseRelative(LinkedList_t* list, const int index)
+int LinkedList_eraseRelative(LinkedList_t *list, const int index)
 {
     list = LinkedList_findRelative(list, index);
     if (list == NULL)
         return 1;
 
-    LinkedList_t* prev_node = list->prev;
-    LinkedList_t* next_node = list->next;
+    LinkedList_t *prev_node = list->prev;
+    LinkedList_t *next_node = list->next;
 
     LinkedList_connectTwoNodes(prev_node, next_node);
-    /*
-    if (prev_node)
-        prev_node->next = next_node;
-
-    if (next_node)
-        next_node->prev = prev_node;
-    */
 
     free(list);
     return 0;
 }
 
-int LinkedList_eraseAbsolute(LinkedList_t* list, const int index)
+int LinkedList_eraseAbsolute(LinkedList_t *list, const int index)
 {
     list = LinkedList_first(list);
     return LinkedList_eraseRelative(list, index);
 }
 
-void LinkedList_eraseAll(LinkedList_t* list)
+void LinkedList_eraseAll(LinkedList_t *list)
 {
     list = LinkedList_first(list);
     while (list)
     {
+        LinkedList_t *erase_node = list;
         list = list->next;
-        free(list->prev);
+        free(erase_node);
     }
 }
